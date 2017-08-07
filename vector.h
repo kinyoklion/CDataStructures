@@ -13,6 +13,15 @@
 //Each different TYPE inclusion will generate a storage struct and associated
 //implementation methods.
 
+//If the type is composed of multiple type specifiers, then a typedef should
+//be used to combine them. 
+//For example:
+//typedef struct TableEntry* EntryPointer;
+//#define TYPE EntryPointer
+//#include "vector.h"
+//#undef TYPE
+
+
 //For int the following struct and methods are generated:
 // struct Vector_int;
 // struct Vector_int* vec_Create_int(size_t chunk_size);

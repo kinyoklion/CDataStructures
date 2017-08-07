@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashtable.h"
+typedef struct TableEntry* EntryPointer;
+#define TYPE EntryPointer
+#include "vector.h"
+#undef TYPE
 
 unsigned long djb2_hash(const char *str)
 {
@@ -83,24 +87,29 @@ struct TableEntry* ht_Get(struct HashTable* self, const char* name)
     return 0;
 }
 
-void freeBucket(struct TableEntry* bucket)
-{
-    while(bucket->next != 0)
-    {
-        freeBucket(bucket->next);
-    }
-    free(bucket);
-}
-
 void ht_Release(struct HashTable* self)
 {
+    struct Vector_EntryPointer* entry_vector = vec_CreateDefault_EntryPointer();
+    
+    //Put all of the buckets on a stack to be deleted.
     for(int bucket_index = 0; bucket_index < self->size; bucket_index++)
     {
         struct TableEntry* bucket = self->buckets[bucket_index];
         if(bucket != 0)
         {
-            //TODO: Need to implement a stack so we do not need to use recursion.
-            freeBucket(bucket);
+            while(bucket->next != 0)
+            {
+                vec_Push_EntryPointer(entry_vector, bucket);
+            }
         }
     }
+    
+    //Delete all the buckets from the stack.
+    while(vec_GetSize_EntryPointer(entry_vector) != 0)
+    {
+        free(vec_Pop_EntryPointer(entry_vector));
+    }
+
+    vec_Release_EntryPointer(entry_vector);
+    free(self);
 }
