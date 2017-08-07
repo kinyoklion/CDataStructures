@@ -68,6 +68,7 @@ struct VEC_STRUCT(TYPE)* VEC_CREATE(TYPE)(size_t chunk_size)
     struct VEC_STRUCT(TYPE)* new_vector = malloc(sizeof(struct VEC_STRUCT(TYPE)));
     new_vector->allocation_chunk = chunk_size;
     new_vector->data = malloc(sizeof(TYPE) * new_vector->allocation_chunk);
+    new_vector->size = 0;
     new_vector->capacity = new_vector->allocation_chunk;
     return new_vector;
 };
@@ -111,6 +112,7 @@ TYPE VEC_POP(TYPE)(struct VEC_STRUCT(TYPE)* self)
 //Release the vector. Does not release items that the vector may contain.
 void VEC_RELEASE(TYPE)(struct VEC_STRUCT(TYPE)* self)
 {
+    free(self->data);
     free(self);
 }
 

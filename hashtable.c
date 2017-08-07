@@ -32,6 +32,7 @@ struct TableEntry* createEntry(const char* name, void* value)
     memset(new_entry, 0, sizeof(struct TableEntry));
     new_entry->name = name;
     new_entry->value = value;
+    new_entry->next = 0;
     return new_entry;
 }
 
@@ -94,11 +95,15 @@ void ht_Release(struct HashTable* self)
     //Put all of the buckets on a stack to be deleted.
     for(int bucket_index = 0; bucket_index < self->size; bucket_index++)
     {
+        
         struct TableEntry* bucket = self->buckets[bucket_index];
         if(bucket != 0)
         {
+            vec_Push_EntryPointer(entry_vector, bucket);
+            
             while(bucket->next != 0)
             {
+                bucket = bucket->next;
                 vec_Push_EntryPointer(entry_vector, bucket);
             }
         }
